@@ -25,6 +25,8 @@ final class Slug extends Annotation
     public $unique = true;
     /** @var string */
     public $unique_base = null;
+    /** @var boolean */
+    public $unique_discr = false;
     /** @var string */
     public $separator = '-';
     /** @var string */

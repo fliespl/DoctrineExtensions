@@ -429,12 +429,25 @@ class SluggableListener extends MappedEventSubscriber
             $base = $meta->getReflectionProperty($config['unique_base'])->getValue($object);
         }
 
+        $discr = false;
+
+        if($config['unique_discr']) {
+            if ($meta->discriminatorValue) {
+                $discr = $meta->discriminatorValue;
+            }
+        }
+
         // collect similar persisted slugs during this flush
         if (isset($this->persisted[$class = $ea->getRootObjectClass($meta)])) {
             foreach ($this->persisted[$class] as $obj) {
                 if ($base !== false && $meta->getReflectionProperty($config['unique_base'])->getValue($obj) !== $base) {
                     continue; // if unique_base field is not the same, do not take slug as similar
                 }
+
+                if($discr !== false && $om->getClassMetadata(get_class($obj))->discriminatorValue !== $discr) {
+                    continue; // if discrimination is not the same, do not take slug as similar
+                }
+
                 $slug = $meta->getReflectionProperty($config['slug'])->getValue($obj);
                 if (preg_match("@^{$preferredSlug}.*@smi", $slug)) {
                     $similarPersisted[] = array($config['slug'] => $slug);

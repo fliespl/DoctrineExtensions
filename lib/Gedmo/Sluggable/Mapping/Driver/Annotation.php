@@ -112,14 +112,23 @@ class Annotation extends AbstractAnnotationDriver
                 if (!is_bool($slug->unique)) {
                     throw new InvalidMappingException("Slug annotation [unique], type is not valid and must be 'boolean' in class - {$meta->name}");
                 }
+                if (!is_bool($slug->unique_discr)) {
+                    throw new InvalidMappingException("Slug annotation [unique_discr], type is not valid and must be 'boolean' in class - {$meta->name}");
+                }
                 if (!empty($meta->identifier) && $meta->isIdentifier($field) && !(bool) $slug->unique) {
                     throw new InvalidMappingException("Identifier field - [{$field}] slug must be unique in order to maintain primary key in class - {$meta->name}");
                 }
                 if ($slug->unique === false && $slug->unique_base) {
                     throw new InvalidMappingException("Slug annotation [unique_base] can not be set if unique is unset or 'false'");
                 }
+                if ($slug->unique === false && $slug->unique_discr) {
+                    throw new InvalidMappingException("Slug annotation [unique_discr] can not be set if unique is unset or 'false'");
+                }
                 if ($slug->unique_base && !$meta->hasField($slug->unique_base) && !$meta->hasAssociation($slug->unique_base)) {
                     throw new InvalidMappingException("Unable to find [{$slug->unique_base}] as mapped property in entity - {$meta->name}");
+                }
+                if ($slug->unique_discr && !$meta->discriminatorColumn) {
+                    throw new InvalidMappingException("Unable to find discriminator column in class {$meta->name}");
                 }
                 // set all options
                 $config['slugs'][$field] = array(
@@ -130,6 +139,7 @@ class Annotation extends AbstractAnnotationDriver
                     'updatable' => $slug->updatable,
                     'unique' => $slug->unique,
                     'unique_base' => $slug->unique_base,
+                    'unique_discr' => $slug->unique_discr,
                     'separator' => $slug->separator,
                     'prefix' => $slug->prefix,
                     'suffix' => $slug->suffix,
