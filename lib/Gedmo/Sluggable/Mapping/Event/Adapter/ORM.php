@@ -46,7 +46,7 @@ class ORM extends BaseAdapterORM implements SluggableAdapter
             }
         }
 
-        if($config['unique'] && isset($config['unique_discr'])) {
+        if($config['unique'] && $config['unique_discr']) {
             $qb->andWhere('rec INSTANCE OF :unique_discr');
             $qb->setParameter(':unique_discr', $meta->discriminatorValue);
         }
